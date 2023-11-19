@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-ruby '3.2.2'
 source "https://rubygems.org"
+ruby '3.2.2'
 
 gem "websocket-driver"
 gem "mysql2"

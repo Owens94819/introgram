@@ -22,4 +22,6 @@ server.use('', ->(req, res){
 
 # puts RubyExpressRequest::Request.new
 puts "server at port #{ENV["PORT"]}"
+
+# require('./.bin/db.rb')
 server.listen()
