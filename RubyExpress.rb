@@ -146,11 +146,8 @@ module RubyExpressMethods
     return pattern
   end
   def ParseReq(req)
-    # req=URI.decode_www_form_component(req)
     req=req.strip().split(/\n([\w\W]+)/)
-    # log req
     req_stat= req[0].split("\s");
-    # @do decode url (req_stat)
 
     header = req[1];
     path = req_stat[1].split(/\?([\w\W]+)/);
@@ -211,16 +208,7 @@ module RubyExpressMethods
   end
 
   def Client(client)
-    # client.readpartial(@MAX_READ)
     request = client.readpartial(@MAX_READ)
-    # for i in 0..300
-    #   str = client.gets;
-    #   if(str)
-    #     request+=str;
-    #   else
-    #     break;
-    #   end
-    # end
     # puts request
       request = ParseReq(request)
       MatchClient(request, client, 0, false)
