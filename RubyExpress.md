@@ -33,6 +33,14 @@ server.use('/path', ->(req, res){
     # res.send('ALL req')
 })
 ```
+## server.listen
+this will initialize the socket
+```ruby 
+server.listen()
+```
+
+
+# arguments
 ## req
 this object contains info from the client
 ### req.headers
