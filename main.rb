@@ -8,7 +8,7 @@ dummy_thread.push(->{
 dummy_thread.push(->{
     puts Thread.current
 })
-server = RubyExpress.new(port: 8080);
+server = RubyExpress.new(port: ENV["PORT"]);
 
 
 server.use('/__socket__', ->(req, res){
