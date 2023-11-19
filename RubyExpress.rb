@@ -231,6 +231,7 @@ class RubyExpress
     @port = port;
     @RPaths = {};
     @SERVED = false;
+    @POSTS=@RPaths["post"]=[]
     @GETS=@RPaths["get"]=[]
     @USE=@RPaths["use"]=[]
 
@@ -250,6 +251,14 @@ class RubyExpress
   def get(pattern, callback)
     pattern= ChkPattern(pattern);
     @GETS.push({
+            pattern:pattern,
+            callback:callback,
+            type: "get"
+          })
+  end
+  def post(pattern, callback)
+    pattern= ChkPattern(pattern);
+    @POSTS.push({
             pattern:pattern,
             callback:callback,
             type: "get"
