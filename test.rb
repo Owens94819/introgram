@@ -10,4 +10,5 @@ server.use('', ->(req, res){
     res.send('404')
 })
 
+puts "server at port 8080"
 server.listen()
