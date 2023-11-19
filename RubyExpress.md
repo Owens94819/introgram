@@ -12,7 +12,7 @@ server.get(pattern, lambda)
 ## server.get
 accepting a GET request from client
 ```ruby 
-server.get('/route', ->(req, res){
+server.get('/path', ->(req, res){
     # res.setHeader('content-type', 'text/html')
     # res.send('GET req')
 })
@@ -20,7 +20,7 @@ server.get('/route', ->(req, res){
 ## server.post
 accepting a POST request from client
 ```ruby 
-server.post('/route', ->(req, res){
+server.post('/path', ->(req, res){
     # res.setHeader('content-type', 'text/html')
     # res.send('POST req')
 })
@@ -28,7 +28,7 @@ server.post('/route', ->(req, res){
 ## server.use
 accepting all kinds of request from client
 ```ruby 
-server.use('/route', ->(req, res){
+server.use('/path', ->(req, res){
     # res.setHeader('content-type', 'text/html')
     # res.send('ALL req')
 })
@@ -51,7 +51,18 @@ this object contains info from the client
  ```
   puts res.path
  ```
-
+### req.method
+ ```
+  puts res.method
+ ```
+### req.url
+ ```
+  puts res.url
+ ```
+### req.search
+ ```
+  puts res.search
+ ```
 ## res
 this object contains methods to initialize a response to the client
 ### res.setHeader
