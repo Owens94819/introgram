@@ -1,13 +1,6 @@
-require "./RubyExpress.rb"
-require "./dummy_thread.rb"
+require "./RubyExpress/RubyExpress.rb"
 
-dummy_thread=Dummy_thread.new(2);
-dummy_thread.push(->{
-    puts Thread.current
-})
-dummy_thread.push(->{
-    puts Thread.current
-})
+
 server = RubyExpress.new(port: 8080);
 
 
@@ -15,14 +8,17 @@ server.use('/__socket__', ->(req, res){
     res.setHeader('content-type', 'text/html')
     res.send('GET req')
 })
-server.post('/home', ->(req, res){
+server.get('/home', ->(req, res){
     res.setHeader('content-type', 'text/html')
-    res.send('POST req')
+    res.write("...")
+    # res.send('POST req')
 })
 
 server.use('', ->(req, res){
+    res.setHeader('4004', 'text/html')
     res.send('404')
 })
 
+# puts RubyExpressRequest::Request.new
 puts "server at port 8080"
 server.listen()
