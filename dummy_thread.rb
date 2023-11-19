@@ -1,7 +1,7 @@
 
 class Dummy_thread
     def initialize(n)
-        @index=0;
+        @level=0;
         @threads=[];
         for i in 1..n
             @threads.push({list:[], init:false})
@@ -21,13 +21,13 @@ class Dummy_thread
         end
     end
     def push(foo)
-        thread = @threads[@index]
+        thread = @threads[@level]
         if(!thread)
-            @index=0;
+            @level=0;
             push(foo)
             return
         else
-            @index+=1
+            @level+=1
         end
 
         if(thread[:init])
