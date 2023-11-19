@@ -1,6 +1,6 @@
 
 require "./RubyExpress/RubyExpress.rb"
-require "./lib/dotenv.rb"
+require "./lib/Dotenv.rb"
 
 Dot_env.new()
 
