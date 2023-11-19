@@ -1,4 +1,5 @@
 require 'socket'
+require 'uri'
 
 module RubyExpressMethods
   private
@@ -145,16 +146,20 @@ module RubyExpressMethods
     return pattern
   end
   def ParseReq(req)
+    # req=URI.decode_www_form_component(req)
     req=req.strip().split(/\n([\w\W]+)/)
+    # log req
     req_stat= req[0].split("\s");
     # @do decode url (req_stat)
 
     header = req[1];
     path = req_stat[1].split(/\?([\w\W]+)/);
-    query = path[1]||""
+    path[0]=URI.decode_www_form_component(path[0])
+    query = URI.decode_www_form_component(path[1]||"")
+
     obj = {
       method:req_stat[0].upcase,
-      url:req_stat[1],
+      url:URI.decode_www_form_component(req_stat[1]),
       path:path[0],
       search:query,
       query:{},
