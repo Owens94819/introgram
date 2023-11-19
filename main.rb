@@ -2,8 +2,7 @@
 require "./RubyExpress/RubyExpress.rb"
 require "./lib/dotenv.rb"
 
-Dot_env.new
-ENV['PORT']="8080"
+Dot_env.new()
 
 server = RubyExpress.new(port: ENV['PORT']);
 
@@ -24,5 +23,5 @@ server.use('', ->(req, res){
 })
 
 # puts RubyExpressRequest::Request.new
-puts "server at port 8080"
+puts "server at port #{ENV["PORT"]}"
 server.listen()
