@@ -1,7 +1,11 @@
+
 require "./RubyExpress/RubyExpress.rb"
+require "./lib/dotenv.rb"
 
+Dot_env.new
+ENV['PORT']="8080"
 
-server = RubyExpress.new(port: 8080);
+server = RubyExpress.new(port: ENV['PORT']);
 
 
 server.use('/__socket__', ->(req, res){

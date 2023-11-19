@@ -1,6 +1,6 @@
 require 'socket'
 require 'uri'
-require "./Dummy_thread.rb"
+require "./lib/Dummy_thread.rb"
 require './RubyExpress/Request.rb'
 require './RubyExpress/Response.rb'
 require './RubyExpress/RubyExpressMethods.rb'
