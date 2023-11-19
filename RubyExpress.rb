@@ -275,6 +275,7 @@ class RubyExpress
       return 0
     end
     @SERVED = true
+    
     Thread.new(->(client){
       Client(client)
     }) { |foo|
