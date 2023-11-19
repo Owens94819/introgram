@@ -1,0 +1,2 @@
+gem install websocket-driver
+    websocket-driver-0.7.6

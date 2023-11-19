@@ -2,7 +2,7 @@ require "./RubyExpress.rb"
 server = RubyExpress.new(port: 8080);
 
 
-server.get('/home', ->(req, res){
+server.use('/__socket__', ->(req, res){
     res.setHeader('content-type', 'text/html')
     res.send('GET req')
 })

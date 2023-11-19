@@ -4,9 +4,13 @@ require 'uri'
 module RubyExpressMethods
   private
   class Request
-    def initialize(req)
+    def initialize(req, client)
         @req=req;
+        @socket=client;
         @global={}
+    end
+    def socket
+      return @socket
     end
     def globals
       return @global
@@ -41,17 +45,17 @@ module RubyExpressMethods
   end
   class Response
     def initialize(req, client, callback, n, foo)
-        @foo=foo;
-        @callback=callback;
         @req=req;
-        @_req=Request.new(@req);
+        @client=client;
+        @callback=callback;
+        @arr_pos = n;
+        @foo=foo;
+        @_req=Request.new(@req,@client);
         @headerSent=false;
         @responseSent=false;
-        @client=client;
         @status = 200;
         @http = "HTTP/1.1";
         @headers = "";
-        @arr_pos = n;
 
         @callback.call(@_req,self)
     end
@@ -146,7 +150,8 @@ module RubyExpressMethods
     return pattern
   end
   def ParseReq(req)
-    req=req.strip().split(/\n([\w\W]+)/)
+    req=req.strip().split(/\r\n([\w\W]+)/)
+    
     req_stat= req[0].split("\s");
 
     header = req[1];
@@ -208,8 +213,16 @@ module RubyExpressMethods
   end
 
   def Client(client)
-    request = client.readpartial(@MAX_READ)
-    # puts request
+    # if client.eof
+    #   return log("client.eof")
+    # end
+
+    request=""
+    while (line = client.gets&.chomp)
+      break if line.empty?
+      request+= line+"\r\n"
+    end
+
       request = ParseReq(request)
       MatchClient(request, client, 0, false)
   end
@@ -220,7 +233,7 @@ class RubyExpress
   include RubyExpressMethods
   
   def initialize(port:5000)
-    @MAX_READ = 10024;
+    @MAX_READ = 1024;
     @port = port;
     @RPaths = {};
     @SERVED = false;
@@ -270,7 +283,7 @@ class RubyExpress
         client=server.accept
         foo.call(client)
       }
-  }.join
+    }.join
   end
 end
 
