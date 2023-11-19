@@ -213,9 +213,9 @@ module RubyExpressMethods
   end
 
   def Client(client)
-    # if client.eof
-    #   return log("client.eof")
-    # end
+    if client.eof
+      return log("client.eof")
+    end
 
     request=""
     while (line = client.gets&.chomp)
