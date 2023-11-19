@@ -6,7 +6,6 @@ Dot_env.new()
 
 server = RubyExpress.new(port: ENV['PORT']);
 
-
 server.use('/__socket__', ->(req, res){
     res.setHeader('content-type', 'text/html')
     res.send('GET req')
