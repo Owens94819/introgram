@@ -1,9 +1,9 @@
 
 class Dummy_thread
-    def initialize(n)
+    def initialize(level)
         @level=0;
         @threads=[];
-        for i in 1..n
+        for i in 1..level
             @threads.push({list:[], init:false})
             Thread.new(->(foo,i){
                 thread=@threads[i]

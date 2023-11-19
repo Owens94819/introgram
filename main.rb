@@ -2,7 +2,12 @@ require "./RubyExpress.rb"
 require "./dummy_thread.rb"
 
 dummy_thread=Dummy_thread.new(2);
-
+dummy_thread.push(->{
+    puts Thread.current
+})
+dummy_thread.push(->{
+    puts Thread.current
+})
 server = RubyExpress.new(port: 8080);
 
 
