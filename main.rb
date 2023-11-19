@@ -19,7 +19,7 @@ server.get('/home', ->(req, res){
 
 server.use('', ->(req, res){
     res.setHeader('4004', 'text/html')
-    res.send('404')
+    res.send('404:'+req.path)
 })
 
 # puts RubyExpressRequest::Request.new
