@@ -1,0 +1,9 @@
+development:
+  adapter: mysql2
+  encoding: utf8
+  database: defaultdb
+  pool: 5
+  username: avnadmin
+  password: AVNS_t8K9draf2lVK7wHEvBK
+  host: mysql-2fa1f5f0-johnsonmach6-2d46.a.aivencloud.com
+  port: 25565
