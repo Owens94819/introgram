@@ -1,30 +1,28 @@
 require 'mysql2'
-require 'yaml'
-require 'active_record'
-puts 88
 
-# Load database configuration from YAML file in the config directory
-db_config = YAML.load_file('config/database.yml')
-puts 88
+# Replace 'your_username', 'your_password', 'your_database' with your actual MySQL credentials
+client = Mysql2::Client.new(
+  host: 'mysql-2fa1f5f0-johnsonmach6-2d46.a.aivencloud.com',
+  username: 'avnadmin',
+  password: 'AVNS_t8K9draf2lVK7wHEvBK',
+  database: 'defaultdb'
+)
 
-# Connect to the database
-ActiveRecord::Base.establish_connection(db_config['development'])
-puts 88
-# # Connect to MySQL
-# client = Mysql2::Client.new(
-#   host: 'localhost',
-#   username: 'root',
-#   password: '',
-#   database: 'localstorage'
-# )
+# Create a table named 'my_tb'
+client.query("
+  CREATE TABLE IF NOT EXISTS my_tb (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    column1 VARCHAR(255),
+    column2 INT
+  )
+")
 
-# # Execute a simple query
-# results = client.query('SELECT * FROM your_table')
+# Get a list of all tables in the database
+tables = client.query('SHOW TABLES')
 
-# # Process the query results
-# results.each do |row|
-#   puts "Column1: #{row['column1']}, Column2: #{row['column2']}"
-# end
+# Extract and print the table names
+table_names = tables.map { |table| table.values.first }
+puts "Tables in the database: #{table_names.join(', ')}"
 
-# # Close the connection
-# client.close
+# Close the connection when done
+client.close
