@@ -1,5 +1,6 @@
+puts "0"
 require 'mysql2'
-
+puts 1
 # Replace 'your_username', 'your_password', 'your_database' with your actual MySQL credentials
 client = Mysql2::Client.new(
   host: 'mysql-2fa1f5f0-johnsonmach6-2d46.a.aivencloud.com',
@@ -7,7 +8,7 @@ client = Mysql2::Client.new(
   password: 'AVNS_t8K9draf2lVK7wHEvBK',
   database: 'defaultdb'
 )
-
+puts 2
 # Create a table named 'my_tb'
 client.query("
   CREATE TABLE IF NOT EXISTS my_tb (
@@ -16,7 +17,7 @@ client.query("
     column2 INT
   )
 ")
-
+puts 3
 # Get a list of all tables in the database
 tables = client.query('SHOW TABLES')
 
