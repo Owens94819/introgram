@@ -22,6 +22,7 @@ class WebSocketServer
     process_client(@req.socket)
     return self
   end
+  
   private
   def process_client(client)
       if @req.headers['upgrade'] == 'websocket'
@@ -64,8 +65,6 @@ class WebSocketServer
       byte=client.getbyte
       payload_length = byte & 0b01111111
 
-      # puts [opcode,byte,payload_length]
-
       case payload_length
       when 126
         payload_length = client.read(2).unpack('n')[0]
@@ -78,18 +77,9 @@ class WebSocketServer
 
       decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
       
-      # puts "Received message: #{decoded_data}"
       @event.emit("message", decoded_data)
       data=mask=decoded_data=0
-      # decoded_data=Base64.encode(decoded_data)
-      # Example: Echo back the message
-      # send_websocket_frame( 1, "decoded_data-#{decoded_data}")
     end
-  # rescue EOFError, Errno::ECONNRESET, Errno::ECONNABORTED
-  #   _close("err");
-  # rescue EOFError, Errno::ECONNABORTED
-  #     puts 'WebSocket connection aborted'
-  #     @res.end("")
   end
 
   def send_websocket_frame( opcode, data)
