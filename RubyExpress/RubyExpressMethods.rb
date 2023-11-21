@@ -1,3 +1,4 @@
+require './RubyExpress/Response.rb'
 module RubyExpressMethods
     include RubyExpressResponse
     private
@@ -22,8 +23,8 @@ module RubyExpressMethods
       end
       return pattern
     end
-    def ParseReq(req)
-      req=req.strip().split(/\r\n([\w\W]+)/)
+    def ParseReq(_req)
+      req=_req.strip().split(/\r\n([\w\W]+)/)
       req_stat= req[0].split("\s");
   
       header = req[1];
@@ -40,6 +41,7 @@ module RubyExpressMethods
         http:req_stat[2],
         rawHeaders: header,
         rawBody: "",
+        rawRequest: _req,
         headers:{}
       }
   
@@ -77,7 +79,7 @@ module RubyExpressMethods
           else
             Response.new(request, client, val[:callback], i+1, ->(n, argv){
               MatchClient(request, client, n, argv)
-            });
+            },val[:useThread]);
           end
           break
         end

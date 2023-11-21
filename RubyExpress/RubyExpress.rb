@@ -1,16 +1,13 @@
 require 'socket'
 require 'uri'
-require "./lib/Dummy_thread.rb"
-require './RubyExpress/Request.rb'
-require './RubyExpress/Response.rb'
+require "./lib/Event.rb"
 require './RubyExpress/RubyExpressMethods.rb'
-DUMMY_THREAD1=Dummy_thread.new(1);
 
 
 
 class RubyExpress
   include RubyExpressMethods
-  def initialize(port:5000)
+  def initialize(port:ENV['PORT'])
     @MAX_READ = 1024;
     @port = port;
     @RPaths = {};
@@ -18,35 +15,47 @@ class RubyExpress
     @POSTS=@RPaths["post"]=[]
     @GETS=@RPaths["get"]=[]
     @USE=@RPaths["use"]=[]
-
-    # @server = TCPServer.open(@port)
+    @event=Event.new()
   end
-  def use(pattern, callback)
+  def use(pattern, callback, useThread:true)
     pattern= ChkPattern(pattern);
     obj = {
               pattern:pattern,
               callback:callback, 
-              type: "use"
+              type: "use",
+              useThread:useThread
           }
     @RPaths.each{|key,val| 
       val.push(obj)
     }
+    return self
   end
-  def get(pattern, callback)
+  def get(pattern, callback, useThread:true)
     pattern= ChkPattern(pattern);
     @GETS.push({
             pattern:pattern,
             callback:callback,
-            type: "get"
+            type: "get",
+            useThread:useThread
           })
+    return self
   end
-  def post(pattern, callback)
+  def post(pattern, callback, useThread:true)
     pattern= ChkPattern(pattern);
     @POSTS.push({
             pattern:pattern,
             callback:callback,
-            type: "get"
+            type: "get",
+            useThread:useThread
           })
+    return self
+  end
+  def port
+    return @port
+  end
+  def on(name, cb)
+    @event.on(name,cb)
+    return self
   end
   def listen
     if(@SERVED)
@@ -54,14 +63,16 @@ class RubyExpress
     end
     @SERVED = true
     
-    DUMMY_THREAD1.push(->{
       server = TCPServer.open(@port)
+      @event.emit("connect",self)
+
       loop{
         client=server.accept
         Client(client)
       }
-    })
-    gets
+      return self
+  rescue Interrupt
+    @event.emit("close",self)
   end
 end
 

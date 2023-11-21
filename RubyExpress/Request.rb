@@ -33,6 +33,9 @@ module RubyExpressRequest
         def rawHeaders
           return @req[:rawHeaders]
         end
+        def rawRequest
+          return @req[:rawRequest]
+        end
         def rawBody
           return @req[:rawBody]
         end
