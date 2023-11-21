@@ -1,11 +1,32 @@
 require 'socket'
 require 'uri'
-require "./lib/Event.rb"
+require "./Lib/Event.rb"
+require "./Lib/MimeType.rb"
 require './RubyExpress/RubyExpressMethods.rb'
+module RubyExpressFoo
+  MIME_TYPE=MimeType.new()
+  def useDir(path)
+    # exist=File.exist?(path)
+    return ->(req,res){
+      file = path+req.path
+      exist=File.exist?(file)&&!file.match?("\\.\\.")
+      if(!exist)
+        res.next()
+        return
+      end
+      res.setHeader("content-type", MIME_TYPE.lookUp(file))
+      File.open(file, 'r').each_line do |bytes|
+        res.write(bytes+"\r\n")
+      end
+      res.end("")
+    }
+  end
 
+end
 
 
 class RubyExpress
+  extend RubyExpressFoo
   include RubyExpressMethods
   def initialize(port:ENV['PORT'])
     @MAX_READ = 1024;

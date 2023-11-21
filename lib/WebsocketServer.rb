@@ -1,14 +1,13 @@
-require("./lib/WebSocket.rb")
+require("./Lib/WebSocketList.rb")
 
 class WebSocketServer
   def initialize(req, res, global)
       @req=req
       @res=res
-      @id=Date
       @client=@req.socket
       @event=Event.new()
+      @id= WebSocketList::push(self)
       accept_websocket_connection()
-      WebSocket::push(self)
   end
 
   def on(name, cb)
@@ -22,7 +21,7 @@ class WebSocketServer
   end
   def broadCast(msg)
     thread = Thread.new do
-      WebSocket::SOCKETS.each do |socket|
+      WebSocketList::SOCKETS.each do |socket|
         if(socket!=self)
           socket.send(msg)
         end

@@ -1,40 +1,25 @@
 
-require "./lib/GlobalMethods.rb"
+require "./Lib/GlobalMethods.rb"
 require "./RubyExpress/RubyExpress.rb"
-require "./lib/DotENV.rb"
-require "./lib/WebSocketServer.rb"
-require "./lib/InstantThread.rb"
+require "./Lib/DotENV.rb"
+require "./Lib/WebSocketServer.rb"
+require "./Lib/WebsocketHandler.rb"
+require "./Lib/InstantThread.rb"
 require "base64"
 require "openssl"
 
 Dot_env.new()
 
 if(ENV["TEST_MODE"])
-    require("./lib/TestScript")
+    require("./Lib/TestScript")
 end
 RubyExpress.new()
 .get('/home', ->(req, res){
     res.setHeader('content-type', 'text/html')
-    res.sendFile('./.bin/page.html')
+    res.sendFile('./UI/page.html')
 })
-.use('/__socket__', ->(req, res){
-    if(req.headers["upgrade"] != "websocket")
-        res.next()
-        return
-    end
-    WebSocketServer.new(req, res, true)
-    .on("connect",->(ws){
-        puts "websock2"
-        ws.on("message",->(msg){
-            puts "data: #{msg}"
-            ws.broadCast(msg)
-        })
-        .on('close', ->(msg){
-            puts "@closing... #{msg}"
-        })
-    })
-    .start()
-})
+.use('/__socket__', WebsocketHandler::CallBack)
+.use('/assets/*', RubyExpress.useDir("./UI"))
 .use('', ->(req, res){
     res.setHeader('content-type', 'text/html')
     res.send('404:'+req.path)

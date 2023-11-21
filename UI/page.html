@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/assets/JS/WebSocket.js"></script>
+</head>
+<body>
+    test
+    <script>
+        client=new WebSocket("ws://localhost:8080/__socket__")
+        client.send({name:"999"})
+        client.on("open", function(e) {
+            console.log(e);
+        })
+        console.log(client);
+    </script>
+</body>
+</html>

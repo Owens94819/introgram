@@ -1,5 +1,7 @@
-module WebSocket
+module WebSocketList
     SOCKETS=[]
+    ID=[0]
+
     def self.push(socket)
       socket.on("connect", ->(socket){
         SOCKETS.push(socket)
@@ -8,7 +10,8 @@ module WebSocket
             SOCKETS.popIndex(socket_id)
         })
       })
-        return SOCKETS.length
+      ID[0]+=1
+      return ID[0]
     end
     def self.pop(index)
         SOCKETS.popIndex(index)
