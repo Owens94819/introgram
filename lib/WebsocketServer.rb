@@ -1,18 +1,14 @@
 require("./lib/WebSocket.rb")
-Websockets= WebSocket.new()
 
 class WebSocketServer
   def initialize(req, res, global)
       @req=req
       @res=res
+      @id=Date
+      @client=@req.socket
       @event=Event.new()
-      @socket_id
-      @event.on("connect", ->(socket){
-        @socket_id=Websockets.push(socket)
-      })
-      @event.on("close", ->(msg){
-        Websockets.pop(@socket_id)
-      })
+      accept_websocket_connection()
+      WebSocket::push(self)
   end
 
   def on(name, cb)
@@ -24,25 +20,31 @@ class WebSocketServer
     send_websocket_frame(1, msg)
     return self
   end
+  def broadCast(msg)
+    thread = Thread.new do
+      WebSocket::SOCKETS.each do |socket|
+        if(socket!=self)
+          socket.send(msg)
+        end
+      end
+      thread.kill()
+    end
+    return self
+  end
   def close()
     _close("user-action")
   end
+  def id 
+    return @id
+  end
   def start
-    process_client(@req.socket)
+    handle_websocket()
     return self
   end
   
   private
-  def process_client(client)
-      if @req.headers['upgrade'] == 'websocket'
-          accept_websocket_connection(client)
-      else
-          @res.setStatus("404")
-          @res.end("Not Found")
-      end
-  end
 
-  def accept_websocket_connection(client)
+  def accept_websocket_connection()
     key = @req.headers['sec-websocket-key']
     accept_key = Base64.strict_encode64(OpenSSL::Digest::SHA1.digest(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'))
 
@@ -52,13 +54,12 @@ class WebSocketServer
                "Sec-WebSocket-Accept: #{accept_key}"
   
     @res.setRawHeaders(response)
-    handle_websocket(client)
   end
 
-  def handle_websocket(client)
+  def handle_websocket()
     @event.emit('connect', self)
     loop do
-      opcode = client.getbyte
+      opcode = @client.getbyte
       if(!opcode)
           _close("no opcode")
           break;
@@ -70,23 +71,23 @@ class WebSocketServer
           break;
       end
 
-      byte=client.getbyte
+      byte=@client.getbyte
       payload_length = byte & 0b01111111
 
       case payload_length
       when 126
-        payload_length = client.read(2).unpack('n')[0]
+        payload_length = @client.read(2).unpack('n')[0]
       when 127
-        payload_length = client.read(8).unpack('Q>')[0]
+        payload_length = @client.read(8).unpack('Q>')[0]
       end
 
-      mask = client.read(4).unpack('C*')
-      data = client.read(payload_length).unpack('C*')
+      mask = @client.read(4).unpack('C*')
+      data = @client.read(payload_length).unpack('C*')
 
       decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
       
       @event.emit("message", decoded_data)
-      data=mask=decoded_data=0
+      data=mask=decoded_data=nil
     end
   end
 
@@ -94,10 +95,11 @@ class WebSocketServer
     frame = [0x80 | opcode, data.bytesize, data].flatten.pack('CCA*')
     @res.write(frame)
   end
+
   def _close(msg)
      @event.emit("close", msg)
      @event.removeAll()
-     msg=0
+     msg=nil
      @res.end("")
   end
 end

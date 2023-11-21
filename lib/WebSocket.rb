@@ -1,13 +1,16 @@
-class WebSocket
-    def initialize()
-        @sockets={}
-        @index=0
+module WebSocket
+    SOCKETS=[]
+    def self.push(socket)
+      socket.on("connect", ->(socket){
+        SOCKETS.push(socket)
+        socket_id=SOCKETS.length-1
+        socket.on("close", ->(msg){
+            SOCKETS.popIndex(socket_id)
+        })
+      })
+        return SOCKETS.length
     end
-    def push(socket)
-        @sockets[@index]=socket
-        return @index
-    end
-    def pop(index)
-        @sockets[@index]=0
+    def self.pop(index)
+        SOCKETS.popIndex(index)
     end
 end

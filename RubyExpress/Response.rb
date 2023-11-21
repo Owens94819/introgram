@@ -20,16 +20,16 @@ module RubyExpressResponse
             @thread
             if(useThread)
               @thread = Thread.new do
-                @callback.call(@_req,@self)
+                @callback.call(@_req, self)
               rescue Errno::EPIPE
-                @self.end("")
+                # @self.end("")
                 puts "Errno::EPIPE (thread)"
               end
             else
               @callback.call(@_req,self)
             end
         rescue Errno::EPIPE
-          @self.end("")
+          # @self.end("")
           puts "Errno::EPIPE"
         end
         def setStatus(code)
@@ -70,12 +70,10 @@ module RubyExpressResponse
         end
         def sendFile(path)
           if File.exist?(path)
-            Instant_thread.new(->{
               File.open(path, 'r').each_line do |bytes|
                 self.write(bytes+"\r\n")
               end
               self.end("")
-            })
           else
             self.end("")
           end

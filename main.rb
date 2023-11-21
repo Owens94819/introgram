@@ -17,74 +17,9 @@ RubyExpress.new()
     res.setHeader('content-type', 'text/html')
     res.sendFile('./.bin/page.html')
 })
-.use('/soc',->(req,res){
-    socket = req.socket
-    class Soc
-        def initialize(req,socket)
-            @req=req
-            @sent=false
-            @socket=socket
-            puts "soc"
-        end
-        def gets
-            puts "gets"
-            if(@sent) 
-                return ""
-            end
-            @sent=true
-            return @req.rawRequest
-        end
-        def getbyte
-            puts "getbyte"
-            return @socket.getbyte
-        end
-        def read(index)
-            puts "read"
-            return @socket.read(index)
-        end
-        def write(bytes)
-            puts "write"
-            return @socket.write(bytes)
-        end
-        def close()
-            puts "close"
-            return @socket.close
-        end
-    end
-
-    # puts Soc.new(req).gets
-    # puts "\n\n-\n"
-    # puts socket.gets
-    # return res.end("")
-    driver = WebSocket::Driver.server(io:Soc.new(req, socket))
-    driver.on :connect do |event|
-      # Handle the WebSocket connection
-      puts 'WebSocket connected'
-    end
-  
-    driver.on :message do |event|
-      # Handle WebSocket messages
-      message = event.data
-      puts "Received message: #{message}"
-  
-      # Send a response
-      driver.text('Server received: ' + message)
-    end
-  
-    driver.on :close do |event|
-      # Handle WebSocket connection close
-      puts 'WebSocket closed'
-      socket.close
-    end
-  
-    driver.start
-    # Thread.new do
-    #     WebSocketServer.new(req, res)
-    # end
-})
-.use('/web', ->(req, res){
+.use('/__socket__', ->(req, res){
     if(req.headers["upgrade"] != "websocket")
-        res.send("websocket conn exp")
+        res.next()
         return
     end
     WebSocketServer.new(req, res, true)
@@ -92,6 +27,7 @@ RubyExpress.new()
         puts "websock2"
         ws.on("message",->(msg){
             puts "data: #{msg}"
+            ws.broadCast(msg)
         })
         .on('close', ->(msg){
             puts "@closing... #{msg}"
@@ -100,7 +36,7 @@ RubyExpress.new()
     .start()
 })
 .use('', ->(req, res){
-    res.setHeader('4004', 'text/html')
+    res.setHeader('content-type', 'text/html')
     res.send('404:'+req.path)
 })
 .on("connect", ->(server){

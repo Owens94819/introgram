@@ -44,7 +44,7 @@ class Dummy_thread
         thread = @threads[level]
         if(thread)
             thread[:thread].kill()
-            @threads[level]=0
+            @threads[level]=nil
         end
     end
 end

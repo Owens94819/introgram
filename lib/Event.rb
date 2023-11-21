@@ -22,10 +22,9 @@ class Event
                 val.call(value)
                 end
             end
-            event=0
         end
     end
     def removeAll
-        @events = 0
+        @events = nil
     end
 end

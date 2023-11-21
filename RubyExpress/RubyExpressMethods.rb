@@ -49,18 +49,18 @@ module RubyExpressMethods
       header.each{|val|
         val = val.split(":")
         obj[:headers][val[0].strip().downcase]=val[1].strip
-        val=0
+        val=nil
       }
   
       query=query.split("&")
       query.each{|val|
         val = val.split("=")
         obj[:query][val[0].strip]=val[1]
-        val=0
+        val=nil
       }
   
       # free memory
-      req_stat = req = header = query = path=0
+      req_stat = req = header = query = path=nil
       return obj
     end
     def MatchClient(request, client, n, argv)

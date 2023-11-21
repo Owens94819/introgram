@@ -5,4 +5,7 @@
 # d.concat([99,88,100])
 # puts d.popIndex(9)
 # puts d.pop(6)
-puts d
+# puts d.push(10)
+# d={s:99,a:900}
+# d.delete(:s)
+# puts d
