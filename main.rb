@@ -1,15 +1,17 @@
 
+require "./lib/GlobalMethods.rb"
 require "./RubyExpress/RubyExpress.rb"
-require "./lib/Dotenv.rb"
-require "./lib/WebsocketServer.rb"
-require "./lib/Instant_thread.rb"
-require "websocket"
+require "./lib/DotENV.rb"
+require "./lib/WebSocketServer.rb"
+require "./lib/InstantThread.rb"
 require "base64"
 require "openssl"
 
-
 Dot_env.new()
 
+if(ENV["TEST_MODE"])
+    require("./lib/TestScript")
+end
 RubyExpress.new()
 .get('/home', ->(req, res){
     res.setHeader('content-type', 'text/html')

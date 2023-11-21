@@ -1,9 +1,18 @@
+require("./lib/WebSocket.rb")
+Websockets= WebSocket.new()
+
 class WebSocketServer
   def initialize(req, res, global)
       @req=req
       @res=res
       @event=Event.new()
-
+      @socket_id
+      @event.on("connect", ->(socket){
+        @socket_id=Websockets.push(socket)
+      })
+      @event.on("close", ->(msg){
+        Websockets.pop(@socket_id)
+      })
   end
 
   def on(name, cb)
@@ -49,7 +58,6 @@ class WebSocketServer
   def handle_websocket(client)
     @event.emit('connect', self)
     loop do
-      puts "socket"
       opcode = client.getbyte
       if(!opcode)
           _close("no opcode")
