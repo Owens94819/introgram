@@ -12,3 +12,9 @@ class Array
          return val
     end
 end
+
+def log(msg)
+    puts("\n")
+    puts(msg)
+    puts("\n")
+end

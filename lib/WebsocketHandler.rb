@@ -6,10 +6,10 @@ module WebsocketHandler
         end
         WebSocketServer.new(req, res, true)
         .on("connect",->(ws){
-            ws.on("message",->(msg){
+            ws.on(":message",->(msg){
                 puts ws.id
                 puts "data: #{msg}"
-                ws.broadCast(msg)
+                ws.broadCast("message",msg)
             })
             .on('close', ->(msg){
                 puts "@closing... #{msg}"

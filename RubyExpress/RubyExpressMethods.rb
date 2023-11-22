@@ -2,11 +2,6 @@ require './RubyExpress/Response.rb'
 module RubyExpressMethods
     include RubyExpressResponse
     private
-    def log(msg)
-      puts("\n")
-      puts(msg)
-      puts("\n")
-    end
     def ChkPattern(pattern)
       if pattern.class === "String"
         pattern=pattern.strip

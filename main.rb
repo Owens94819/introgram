@@ -1,4 +1,6 @@
 
+
+
 require "./Lib/GlobalMethods.rb"
 require "./RubyExpress/RubyExpress.rb"
 require "./Lib/DotENV.rb"
@@ -10,22 +12,36 @@ require "openssl"
 
 Dot_env.new()
 
-if(ENV["TEST_MODE"])
-    require("./Lib/TestScript")
-end
 RubyExpress.new()
-.get('/home', ->(req, res){
+.get('/', ->(req, res){
     res.setHeader('content-type', 'text/html')
-    res.sendFile('./UI/page.html')
+    # res.sendHeaders()
+    # req.socket.write("pp")
+    # req.socket.close()
+    # req.socket.close()
+    # # req.socket.write("pp1")
+    # res.write("lll")
+    # Thread.new do
+    #     sleep(5)
+    #     puts 888
+    #     res.write(999)
+    #     res.write(999)
+    #     # res.end(999)
+    # end
+        res.sendFile('./UI/page.html')
 })
 .use('/__socket__', WebsocketHandler::CallBack)
 .use('/assets/*', RubyExpress.useDir("./UI"))
-.use('', ->(req, res){
+.use('/*', ->(req, res){
     res.setHeader('content-type', 'text/html')
+    # res.status
     res.send('404:'+req.path)
 })
 .on("connect", ->(server){
     puts "served @ #{server.port()}"
+    if(ENV["TEST_MODE"])
+        require("./Lib/TestScript")
+    end
 })
 .on("close",->(server){
     puts "closing"

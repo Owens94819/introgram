@@ -1,34 +1,37 @@
 require 'socket'
 require 'uri'
 require "./Lib/Event.rb"
-require "./Lib/MimeType.rb"
+require "./Lib/MimeTypes.rb"
 require './RubyExpress/RubyExpressMethods.rb'
 module RubyExpressFoo
-  MIME_TYPE=MimeType.new()
+  MIME_TYPES=MimeTypes.new()
   def useDir(path)
     # exist=File.exist?(path)
     return ->(req,res){
-      file = path+req.path
-      exist=File.exist?(file)&&!file.match?("\\.\\.")
-      if(!exist)
-        res.next()
-        return
-      end
-      res.setHeader("content-type", MIME_TYPE.lookUp(file))
-      File.open(file, 'r').each_line do |bytes|
-        res.write(bytes+"\r\n")
-      end
+      file = File.join(path, req.path)
+      begin
+        exist=File.exist?(file)&&!File.directory?(file)&&!file.match?("\\.\\.")
+        if(!exist)
+          throw "no File"
+        end
+        res.setHeader("content-type", MIME_TYPES.lookUp(file))
+        File.open(file, 'r').each_line do |bytes|
+          res.write(bytes+"\r\n")
+        end
       res.end("")
+      rescue
+        res.next();
+      end
     }
   end
-
 end
 
 
-class RubyExpress
+class RubyExpress < Event
   extend RubyExpressFoo
   include RubyExpressMethods
   def initialize(port:ENV['PORT'])
+    super()
     @MAX_READ = 1024;
     @port = port;
     @RPaths = {};
@@ -36,7 +39,7 @@ class RubyExpress
     @POSTS=@RPaths["post"]=[]
     @GETS=@RPaths["get"]=[]
     @USE=@RPaths["use"]=[]
-    @event=Event.new()
+    # @event=self
   end
   def use(pattern, callback, useThread:true)
     pattern= ChkPattern(pattern);
@@ -74,10 +77,6 @@ class RubyExpress
   def port
     return @port
   end
-  def on(name, cb)
-    @event.on(name,cb)
-    return self
-  end
   def listen
     if(@SERVED)
       return 0
@@ -85,7 +84,7 @@ class RubyExpress
     @SERVED = true
     
       server = TCPServer.open(@port)
-      @event.emit("connect",self)
+      self.emit("connect",self)
 
       loop{
         client=server.accept
@@ -93,7 +92,7 @@ class RubyExpress
       }
       return self
   rescue Interrupt
-    @event.emit("close",self)
+    self.emit("close",self)
   end
 end
 

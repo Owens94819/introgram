@@ -1,29 +1,29 @@
+require("json")
 require("./Lib/WebSocketList.rb")
 
-class WebSocketServer
+class WebSocketServer < Event
   def initialize(req, res, global)
+    super()
       @req=req
       @res=res
+      @df_type="message"
       @client=@req.socket
-      @event=Event.new()
+      # @event=self
       @id= WebSocketList::push(self)
+      @id=Base64.encode64(OpenSSL::Digest::SHA1.digest("#{@id}" + ENV["HASH"]))
       accept_websocket_connection()
   end
 
-  def on(name, cb)
-    @event.on(name, cb)
-    return self
-  end
-
-  def send(msg)
+  def send(type, msg, default: false)
+    msg=JSON.unparse({data:msg,type:"#{type}".strip()||@df_type,default: default})
     send_websocket_frame(1, msg)
     return self
   end
-  def broadCast(msg)
+  def broadCast(type, msg, default: false)
     thread = Thread.new do
       WebSocketList::SOCKETS.each do |socket|
         if(socket!=self)
-          socket.send(msg)
+          socket.send(type, msg, default: default)
         end
       end
       thread.kill()
@@ -45,18 +45,17 @@ class WebSocketServer
 
   def accept_websocket_connection()
     key = @req.headers['sec-websocket-key']
-    accept_key = Base64.strict_encode64(OpenSSL::Digest::SHA1.digest(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'))
-
-    response = "HTTP/1.1 101 Switching Protocols\r\n" \
-               "Upgrade: websocket\r\n" \
-               "Connection: Upgrade\r\n" \
-               "Sec-WebSocket-Accept: #{accept_key}"
-  
-    @res.setRawHeaders(response)
+    accept_key = Base64.strict_encode64(OpenSSL::Digest::SHA1.digest(key + ENV["HASH"]))
+    @res.setStatus(101)
+    @res.setHeader("Upgrade","Websocket")
+    @res.setHeader("Connection","Upgrade")
+    @res.setHeader("Sec-WebSocket-Accept",accept_key)
+    @res.sendHeaders()
   end
 
   def handle_websocket()
-    @event.emit('connect', self)
+    self.emit('connect', self)
+    send("connect",{id:@id},default:true)
     loop do
       opcode = @client.getbyte
       if(!opcode)
@@ -84,8 +83,18 @@ class WebSocketServer
       data = @client.read(payload_length).unpack('C*')
 
       decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
-      
-      @event.emit("message", decoded_data)
+
+      begin
+        decoded_data=JSON.parse(decoded_data)
+      rescue
+        json={}
+        json["data"]=decoded_data
+        json["type"]=@df_type
+        # json["id"]=@df_type
+        decoded_data=json
+      end
+      log(decoded_data)
+      self.emit(":#{decoded_data["type"]}", decoded_data["data"])
       data=mask=decoded_data=nil
     end
   end
@@ -96,8 +105,8 @@ class WebSocketServer
   end
 
   def _close(msg)
-     @event.emit("close", msg)
-     @event.removeAll()
+     self.emit("close", msg)
+     self.removeAll()
      msg=nil
      @res.end("")
   end

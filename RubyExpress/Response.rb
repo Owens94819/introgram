@@ -1,6 +1,7 @@
 require './RubyExpress/Request.rb'
 module RubyExpressResponse
-    private
+   private
+   require("./Lib/StatusCodes.rb")
     class Response
         include RubyExpressRequest
         def initialize(req, client, callback, n, foo, useThread)
@@ -13,33 +14,36 @@ module RubyExpressResponse
             @headerSent=false;
             @responseSent=false;
             @status = 200;
-            @status_msg = "";
+            @status_msg = StatusCodes[:"#{@status}"];
             @http = "HTTP/1.1";
             @headers = "";
+            @closed = false;
             @self = self;
             @thread
             if(useThread)
               @thread = Thread.new do
                 @callback.call(@_req, self)
-              rescue Errno::EPIPE
-                # @self.end("")
-                puts "Errno::EPIPE (thread)"
+              rescue
+                terminate()
+                puts "Error (thread)"
               end
             else
               @callback.call(@_req,self)
             end
-        rescue Errno::EPIPE
-          # @self.end("")
-          puts "Errno::EPIPE"
+        rescue
+          terminate()
+          puts "Error (cb)"
         end
         def setStatus(code)
           if(@headerSent)
             return log("headers sent already")
           end
           @status = Integer(code)
-          if(code>600||code<200)
+          status_msg = StatusCodes[:"#{@status}"];
+          if(!status_msg)
             return log("incorrect status code")
           end
+          @status_msg=status_msg
         end
         def setHeader(key, val)
           if(@headerSent)
@@ -57,6 +61,21 @@ module RubyExpressResponse
             @headers+="#{key}: #{val}\r\n"
           end
         end
+        def send(bytes)
+          self.end(bytes)
+        end
+        def sendFile(path)
+          if File.exist?(path)
+              File.open(path, 'r') do |file|
+                file.each_line do |bytes|
+                  self.write(bytes+"\r\n")
+                end
+              end
+              self.end("")
+          else
+            self.end("")
+          end
+        end
         def next()
           if(@responseSent)
             return log("response sent already, invalid \"next\"")
@@ -65,25 +84,15 @@ module RubyExpressResponse
             @arr_pos=n
           }]);
         end
-        def send(bytes)
-          self.end(bytes)
-        end
-        def sendFile(path)
-          if File.exist?(path)
-              File.open(path, 'r').each_line do |bytes|
-                self.write(bytes+"\r\n")
-              end
-              self.end("")
-          else
-            self.end("")
-          end
-        end
         def write(bytes)
           if(@responseSent)
             return log("response sent already (write)")
           end
           !@headerSent && sendHeaders;
           @client.write(bytes)
+        rescue Errno::EPIPE
+          terminate()
+          puts "Errno::EPIPE (write)"
         end
         def end(bytes)
           if(@responseSent)
@@ -93,7 +102,10 @@ module RubyExpressResponse
           !@responseSent && (@responseSent=true);
           bytes && @client.write(bytes);
           @client.close()
-          @thread&&@thread.kill()
+          killThread()
+        rescue Errno::EPIPE
+          terminate()
+          puts "Errno::EPIPE (end)"
         end
         def setRawHeaders(headers)
           if(@headerSent)
@@ -106,7 +118,6 @@ module RubyExpressResponse
         def killThread
           @thread&&@thread.kill()
         end
-        private
         def sendHeaders
           if(@headerSent)
             return log("headers sent already")
@@ -116,10 +127,10 @@ module RubyExpressResponse
           @client.write(@headers)
           @client.write("\r\n")
         end
-        def log(msg)
-          puts("\n")
-          puts(msg)
-          puts("\n")
+        private 
+        def terminate
+          killThread();
+          @client.close()
         end
       end
 end

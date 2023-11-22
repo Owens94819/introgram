@@ -10,8 +10,11 @@
     test
     <script>
         client=new WebSocket("ws://localhost:8080/__socket__")
-        client.send({name:"999"})
+        client.send("message","hello world")
         client.on("open", function(e) {
+            console.log("ready");
+        })
+        client.on(":message", function(e) {
             console.log(e);
         })
         console.log(client);
