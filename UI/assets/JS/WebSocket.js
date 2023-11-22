@@ -15,7 +15,8 @@ var _WebSocket=window.WebSocket;
     this.send=function (type,msg) {
         if(ready){
             try {
-                msg=JSON.stringify({type:type.toString().trim()||df_type,data:msg, from:id, to: ""})
+                type=type.toString().trim()||df_type
+                msg=JSON.stringify({type:type,data:msg, to: ""})
             } catch (error) {
                 msg ={data:msg,type:df_type, from:id}
             }

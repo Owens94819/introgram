@@ -55,8 +55,8 @@ class WebSocketServer < Event
   end
 
   def handle_websocket()
-    self.emit('connect', self)
     send("connect",{id:@id},default:true)
+    self.emit('connect', self)
     loop do
       opcode = @client.getbyte
       if(!opcode)
@@ -64,7 +64,7 @@ class WebSocketServer < Event
           break;
       end
       # 136 close
-      # 130 blob/buffer
+      # 130 buffer
       if(opcode === 136)
           _close("closed: #{opcode||"null"}")
           break;
@@ -98,7 +98,9 @@ class WebSocketServer < Event
       self.emit(":#{decoded_data["type"]}", decoded_data["data"])
       data=mask=decoded_data=nil
     end
+
     log("a socket ended (this in unhandle and you should refer to code) filename: WebSocketServer.rb, line: (around 103), def_name: handle_websocket, pos: (at end of method)")
+  
   end
 
   def send_websocket_frame( opcode, data)
