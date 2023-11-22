@@ -1,19 +1,18 @@
 module WebSocketList
-    SOCKETS=[]
+    SOCKETS={}
     ID=[0]
 
     def self.push(socket)
+      id=ID[0]+=1
       socket.on("connect", ->(socket){
-        SOCKETS.push(socket)
-        socket_id=SOCKETS.length-1
+        SOCKETS[id]=socket
         socket.on("close", ->(msg){
-            SOCKETS.popIndex(socket_id)
+          SOCKETS.delete(id)
         })
       })
-      ID[0]+=1
-      return ID[0]
+      return id
     end
-    def self.pop(index)
-        SOCKETS.popIndex(index)
+    def self.pop(id)
+        SOCKETS.delete(id)
     end
 end

@@ -33,7 +33,11 @@
 # t.kill()
 # t.kill()
 
-s=OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"])
-s1=OpenSSL::Digest::SHA1.digest("hey")
-d=Base64.encode64(OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"]))
+# s=OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"])
+# s1=OpenSSL::Digest::SHA1.digest("hey")
+# d=Base64.encode64(OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"]))
 # puts d
+
+# d={a:90,b:000}
+
+# log(d.length)

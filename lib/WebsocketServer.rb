@@ -20,8 +20,9 @@ class WebSocketServer < Event
     return self
   end
   def broadCast(type, msg, default: false)
+    # log("total socket: #{WebSocketList::SOCKETS.size}")
     thread = Thread.new do
-      WebSocketList::SOCKETS.each do |socket|
+      for (id,socket) in WebSocketList::SOCKETS
         if(socket!=self)
           socket.send(type, msg, default: default)
         end
@@ -90,13 +91,14 @@ class WebSocketServer < Event
         json={}
         json["data"]=decoded_data
         json["type"]=@df_type
-        # json["id"]=@df_type
+        # json["from"]=
+        # json["to"]=
         decoded_data=json
       end
-      log(decoded_data)
       self.emit(":#{decoded_data["type"]}", decoded_data["data"])
       data=mask=decoded_data=nil
     end
+    log("a socket ended (this in unhandle and you should refer to code) filename: WebSocketServer.rb, line: (around 103), def_name: handle_websocket, pos: (at end of method)")
   end
 
   def send_websocket_frame( opcode, data)
@@ -105,9 +107,9 @@ class WebSocketServer < Event
   end
 
   def _close(msg)
-     self.emit("close", msg)
-     self.removeAll()
-     msg=nil
-     @res.end("")
+    self.emit("close", msg)
+    self.removeAll()
+    msg=nil
+    @res.end("")
   end
 end

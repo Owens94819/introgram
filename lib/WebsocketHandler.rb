@@ -6,6 +6,7 @@ module WebsocketHandler
         end
         WebSocketServer.new(req, res, true)
         .on("connect",->(ws){
+            # log("connected")
             ws.on(":message",->(msg){
                 puts ws.id
                 puts "data: #{msg}"

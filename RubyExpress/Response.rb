@@ -23,16 +23,16 @@ module RubyExpressResponse
             if(useThread)
               @thread = Thread.new do
                 @callback.call(@_req, self)
-              rescue
+              rescue Errno::EPIPE
+                puts "Errno::EPIPE (thread)"
                 terminate()
-                puts "Error (thread)"
               end
             else
               @callback.call(@_req,self)
             end
-        rescue
-          terminate()
+        rescue Errno::EPIPE
           puts "Error (cb)"
+          terminate()
         end
         def setStatus(code)
           if(@headerSent)
@@ -86,26 +86,25 @@ module RubyExpressResponse
         end
         def write(bytes)
           if(@responseSent)
-            return log("response sent already (write)")
+            return log("response sent already (write)\ndata: #{bytes}\n---")
           end
           !@headerSent && sendHeaders;
           @client.write(bytes)
         rescue Errno::EPIPE
-          terminate()
           puts "Errno::EPIPE (write)"
+          terminate()
         end
         def end(bytes)
           if(@responseSent)
-            return log("response sent already (end)")
+            return log("response sent already (end) \ndata: #{bytes}\n---")
           end
           !@headerSent && sendHeaders;
           !@responseSent && (@responseSent=true);
           bytes && @client.write(bytes);
-          @client.close()
-          killThread()
-        rescue Errno::EPIPE
           terminate()
+        rescue Errno::EPIPE
           puts "Errno::EPIPE (end)"
+          terminate()
         end
         def setRawHeaders(headers)
           if(@headerSent)
@@ -129,8 +128,8 @@ module RubyExpressResponse
         end
         private 
         def terminate
-          killThread();
           @client.close()
+          killThread();
         end
       end
 end
