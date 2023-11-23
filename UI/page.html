@@ -20,8 +20,8 @@
         xhr.open("post","/post")
         // arr=new Uint8Array((1024*1024)*2)
         // arr.fill(24)
-        xhr.send('{"p":99}');
-
+        xhr.send(new Blob(["p","p"]));
+// fetch("/post",{method:"post", body:'{"p":90}'})
         client=new WebSocket("ws://localhost:8080/__socket__")
         // client.send("message","hello world")
         client.on("open", function(e) {

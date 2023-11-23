@@ -39,11 +39,8 @@ module RubyExpressRequest
         def rawRequest
           return @req[:rawRequest]
         end
-        def rawBody(body:nil)
-          if(body)
-            @req[:rawBody]=body
-          end
-          return @req[:rawBody]
+        def rawBody(index)
+          return @socket.readpartial(index)
         end
         def body(body:nil)
           if(body)

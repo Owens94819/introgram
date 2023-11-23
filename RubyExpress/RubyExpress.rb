@@ -40,20 +40,17 @@ module RubyExpressFoo
           throw ""
         end
         socket=req.socket
-        data=req.rawBody(body:socket.readpartial(1024));
-        size=data.size;
-        if(!data)
-          throw ""
-        end
-        data.strip!
-        # data.match(/^\{.*\}$/)
-        if(req.headers["content-type"] === "application/x-www-form-urlencoded")
-          RubyExpressFoo::parseQuery(data, obj:req.body)
-        elsif(req.headers["content-type"].match(/application\/(ld+)?json5?/))
-          data=req.body(body:JSON.parse(data))
+        type=req.headers["content-type"]||""
+        if(type === "application/x-www-form-urlencoded")
+          data=RubyExpressFoo::parseQuery(socket.readpartial(1024), obj:req.body)
+        elsif(type.match?(/^application\/(ld+)?json5?$/))
+          data=req.body(body:JSON.parse(socket.readpartial(1024)))
+        else
+          # data={}
+          # req.body(body: data)
         end
         res.next();
-      rescue
+      rescue (UncaughtThrowError)
         res.next();
       end
     }
