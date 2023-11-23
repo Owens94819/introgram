@@ -13,8 +13,7 @@ require "openssl"
 Dot_env.new()
 
 RubyExpress.new()
-.get('/:test1/:test2', ->(req, res){
-    puts req.param
+.get('/', ->(req, res){
     res.setHeader('content-type', 'text/html')
     res.sendFile('./UI/page.html')
 })
