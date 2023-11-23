@@ -8,7 +8,7 @@ var _WebSocket=window.WebSocket;
     var id;
     var client=new _WebSocket(path)
     var custom_event=document.createEvent("CustomEvent")
-
+    // client.send({type:df_type,data:"ii", to: ""})
     console.log(client);
     var self = this;
     var pending_msg =[]

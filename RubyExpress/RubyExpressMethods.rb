@@ -3,20 +3,41 @@ module RubyExpressMethods
     include RubyExpressResponse
     private
     def ChkPattern(pattern)
+      params=[] #{:prop:[], val:""}
       if pattern.class === "String"
-        pattern=pattern.strip
+        pattern.strip!
+        pattern.sub!(/^[\/]?/,"/")
+         .sub!(/[\/]?$/,"/")
+
+        # param=pattern.match(/(?=[\\\/]\:([a-z]+)(?:[\\\/]|$))/, 3)
+        param=pattern.split(/[^:]+(\:[a-z][a-z0-9]+)/i)
+        pattern.gsub!(/(\(|\))/i,"\\\\\\1")
+        pattern.gsub!(/:[a-z][a-z0-9]+/i,"([^/]+)")
+        if(param&&param.length>1)
+          param.each do |val|
+            val.strip!
+            if(val.size>1)
+              val.sub!(/^\:/,"")
+              params.push(val)
+              # params[:prop].push(val)
+              # params[:val]+="\\#{params[:prop].size},"
+            end
+          end
+        else
+          param=nil
+        end
         len = pattern.length;
         if len===0
           pattern = ".*"
         else
-          pattern = pattern.gsub('*','.*')
+          pattern.gsub!('*','.*')
         end
         pattern = Regexp.new("^"+pattern+"$")
       else
         print "Unexpected!!\n"
         pattern =/^.*/
       end
-      return pattern
+      return [pattern, params]
     end
     def ParseReq(_req)
       req=_req.strip().split(/\r\n([\w\W]+)/)
@@ -24,7 +45,7 @@ module RubyExpressMethods
   
       header = req[1];
       path = req_stat[1].split(/\?([\w\W]+)/);
-      path[0]=URI.decode_www_form_component(path[0])
+      path[0]=URI.decode_www_form_component(path[0]).sub(/[\/]?$/,"/")
       query = URI.decode_www_form_component(path[1]||"")
   
       obj = {
@@ -37,7 +58,8 @@ module RubyExpressMethods
         rawHeaders: header,
         rawBody: "",
         rawRequest: _req,
-        headers:{}
+        headers:{},
+        param:{}
       }
   
       header = header.split(/\r\n|\n/)
@@ -66,8 +88,22 @@ module RubyExpressMethods
   
       for i in n..req_method_obj.length-1
         val = req_method_obj[i]
-        is_match = !(!request[:path].match(val[:pattern]))
+        pattern=val[:pattern]
+        
+        is_match = request[:path].match?(pattern[0])
         if(is_match)
+          params = request[:path].split(pattern[0])
+          if(params&&params.size>1)
+            i=0
+            params.each do |val|
+              val.strip!
+              if(val.size>0)
+                param=pattern[1][i]
+                i+=1
+                request[:param][param]=val
+              end
+            end
+          end
           if argv
             argv[2].call(i+1)
             val[:callback].call(argv[0],argv[1])

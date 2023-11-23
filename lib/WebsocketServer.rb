@@ -70,37 +70,35 @@ class WebSocketServer < Event
           break;
       end
 
-      byte=@client.getbyte
-      payload_length = byte & 0b01111111
-
-      case payload_length
-      when 126
-        payload_length = @client.read(2).unpack('n')[0]
-      when 127
-        payload_length = @client.read(8).unpack('Q>')[0]
-      end
-
-      mask = @client.read(4).unpack('C*')
-      data = @client.read(payload_length).unpack('C*')
-
-      decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
-
-      begin
-        decoded_data=JSON.parse(decoded_data)
-      rescue
-        json={}
-        json["data"]=decoded_data
-        json["type"]=@df_type
-        # json["from"]=
-        # json["to"]=
-        decoded_data=json
-      end
-      self.emit(":#{decoded_data["type"]}", decoded_data["data"])
-      data=mask=decoded_data=nil
-    end
-
-    log("a socket ended (this in unhandle and you should refer to code) filename: WebSocketServer.rb, line: (around 103), def_name: handle_websocket, pos: (at end of method)")
+        byte=@client.getbyte
+        payload_length = byte & 0b01111111
   
+        case payload_length
+        when 126
+          payload_length = @client.read(2).unpack('n')[0]
+        when 127
+          payload_length = @client.read(8).unpack('Q>')[0]
+        end
+  
+        mask = @client.read(4).unpack('C*')
+        data = @client.read(payload_length).unpack('C*')
+  
+        decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
+  
+        begin
+          decoded_data=JSON.parse(decoded_data)
+          if("#{decoded_data.class}" != "Hash")
+            throw
+          end
+        rescue
+          decoded_data=default(decoded_data)
+        end
+        self.emit(":#{decoded_data["type"]}", decoded_data["data"])
+        data=mask=decoded_data=nil
+    end
+  
+      log("a socket ended (this in unhandle and you should refer to code) filename: WebSocketServer.rb, line: (around 103), def_name: handle_websocket, pos: (at end of method)")
+    
   end
 
   def send_websocket_frame( opcode, data)
@@ -110,8 +108,15 @@ class WebSocketServer < Event
 
   def _close(msg)
     self.emit("close", msg)
-    self.removeAll()
     msg=nil
-    @res.end("")
+    self.removeAll()
+  end
+  def default(data)
+    json={}
+        json["data"]=data
+        json["type"]=@df_type
+        # json["from"]=
+        # json["to"]=
+        return json
   end
 end

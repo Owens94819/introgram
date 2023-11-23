@@ -38,6 +38,12 @@
 # d=Base64.encode64(OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"]))
 # puts d
 
-# d={a:90,b:000}
+# d=JSON.parse('{"l":90,"n":9}')
+# d={}
+# if "#{d.class}" == 'Hash'
+#     log('yes')
+# end
+# log("#{d.class.strip}")
 
-# log(d.length)
+# d=[]
+# log("#{d.class !== 8}")

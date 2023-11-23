@@ -14,6 +14,7 @@ module WebsocketHandler
             })
             .on('close', ->(msg){
                 puts "@closing... #{msg}"
+                res.end("")
             })
         })
         .start()

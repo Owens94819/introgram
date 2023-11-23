@@ -125,6 +125,9 @@ module RubyExpressResponse
           @client.write("#{@http} #{@status} #{@status_msg}\r\n")
           @client.write(@headers)
           @client.write("\r\n")
+        rescue Errno::EPIPE
+          puts "Errno::EPIPE (sendHeaders)"
+          terminate()
         end
         private 
         def terminate

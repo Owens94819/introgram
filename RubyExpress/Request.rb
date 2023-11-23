@@ -18,6 +18,9 @@ module RubyExpressRequest
         def query
           return @req[:query]
         end
+        def param
+          return @req[:param]
+        end
         def method
           return @req[:method]
         end
