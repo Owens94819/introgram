@@ -7,12 +7,12 @@ module RubyExpressMethods
       if pattern.class === "String"
         pattern.strip!
         pattern.sub!(/^[\/]?/,"/")
-         .sub!(/[\/]?$/,"/")
+        #  .sub!(/[\/]?$/,"/")
 
         # param=pattern.match(/(?=[\\\/]\:([a-z]+)(?:[\\\/]|$))/, 3)
         param=pattern.split(/[^:]+(\:[a-z][a-z0-9]+)/i)
         pattern.gsub!(/(\(|\))/i,"\\\\\\1")
-        pattern.gsub!(/:[a-z][a-z0-9]+/i,"([^/]+)")
+        pattern.gsub!(/:[a-z][a-z0-9]+/i,"([^/]+)/?")
         if(param&&param.length>1)
           param.each do |val|
             val.strip!
@@ -45,7 +45,7 @@ module RubyExpressMethods
   
       header = req[1];
       path = req_stat[1].split(/\?([\w\W]+)/);
-      path[0]=URI.decode_www_form_component(path[0]).sub(/[\/]?$/,"/")
+      path[0]=URI.decode_www_form_component(path[0])#.sub(/[\/]?$/,"/")
       query = URI.decode_www_form_component(path[1]||"")
   
       obj = {
@@ -89,10 +89,12 @@ module RubyExpressMethods
       for i in n..req_method_obj.length-1
         val = req_method_obj[i]
         pattern=val[:pattern]
-        
-        is_match = request[:path].match?(pattern[0])
+        path=request[:path]
+        is_match = path.match?(pattern[0])
+        path=path.sub(/\/?$/,"/")
         if(is_match)
-          params = request[:path].split(pattern[0])
+          params = path.split(pattern[0])
+          # puts(path,pattern[0])
           if(params&&params.size>1)
             i=0
             params.each do |val|
