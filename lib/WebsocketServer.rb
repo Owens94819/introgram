@@ -48,10 +48,10 @@ class WebSocketServer < Event
     key = @req.headers['sec-websocket-key']
     accept_key = Base64.strict_encode64(OpenSSL::Digest::SHA1.digest(key + ENV["HASH"]))
     @res.setStatus(101)
-    @res.setHeader("Upgrade","Websocket")
-    @res.setHeader("Connection","Upgrade")
-    @res.setHeader("Sec-WebSocket-Accept",accept_key)
-    @res.sendHeaders()
+    .setHeader("Upgrade","Websocket")
+    .setHeader("Connection","Upgrade")
+    .setHeader("Sec-WebSocket-Accept",accept_key)
+    .sendHeaders()
   end
 
   def handle_websocket()

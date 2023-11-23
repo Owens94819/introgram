@@ -47,3 +47,13 @@
 
 # d=[]
 # log("#{d.class !== 8}")
+
+# def d(g)
+#     g+=9
+#     return 100
+#     rescue
+#         puts "err"
+# return 90
+# end
+
+# puts d(9)

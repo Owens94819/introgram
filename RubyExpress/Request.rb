@@ -39,8 +39,17 @@ module RubyExpressRequest
         def rawRequest
           return @req[:rawRequest]
         end
-        def rawBody
+        def rawBody(body:nil)
+          if(body)
+            @req[:rawBody]=body
+          end
           return @req[:rawBody]
+        end
+        def body(body:nil)
+          if(body)
+            @req[:body]=body
+          end
+          return @req[:body]
         end
         def http
           return @req[:http]

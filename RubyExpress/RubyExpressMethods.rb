@@ -6,6 +6,7 @@ module RubyExpressMethods
       params=[] #{:prop:[], val:""}
       if pattern.class === "String"
         pattern.strip!
+        len = pattern.length;
         pattern.sub!(/^[\/]?/,"/")
         #  .sub!(/[\/]?$/,"/")
 
@@ -23,10 +24,8 @@ module RubyExpressMethods
               # params[:val]+="\\#{params[:prop].size},"
             end
           end
-        else
-          param=nil
         end
-        len = pattern.length;
+
         if len===0
           pattern = ".*"
         else
@@ -57,6 +56,7 @@ module RubyExpressMethods
         http:req_stat[2],
         rawHeaders: header,
         rawBody: "",
+        body:{},
         rawRequest: _req,
         headers:{},
         param:{}
@@ -69,12 +69,7 @@ module RubyExpressMethods
         val=nil
       }
   
-      query=query.split("&")
-      query.each{|val|
-        val = val.split("=")
-        obj[:query][val[0].strip]=val[1]
-        val=nil
-      }
+      RubyExpressFoo::parseQuery(query, obj: obj[:query])
   
       # free memory
       req_stat = req = header = query = path=nil
@@ -123,7 +118,6 @@ module RubyExpressMethods
         client.close()
         return log("client.eof")
       end
-  
       request=""
       while (line = client.gets&.chomp)
         break if line.empty?

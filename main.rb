@@ -13,16 +13,18 @@ require "openssl"
 Dot_env.new()
 
 RubyExpress.new()
+.use('', RubyExpress.useBody())
 .get('/', ->(req, res){
-    res.setHeader('content-type', 'text/html')
-    res.sendFile('./UI/page.html')
+    res.setHeader('content-type', 'text/html').sendFile('./UI/page.html')
+})
+.post('/post', ->(req, res){
+    # log(req.body)
+    res.end("hello")
 })
 .use('/__socket__', WebsocketHandler::CallBack)
 .use('/assets/*', RubyExpress.useDir("./UI"))
-.use('/*', ->(req, res){
-    res.setHeader('content-type', 'text/html')
-    # res.status
-    res.send('404:'+req.path)
+.use('', ->(req, res){
+    res.sendStatus(404)
 })
 .on("connect", ->(server){
     puts "served @ #{server.port()}"

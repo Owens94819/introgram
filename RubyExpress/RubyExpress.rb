@@ -5,6 +5,15 @@ require "./Lib/MimeTypes.rb"
 require './RubyExpress/RubyExpressMethods.rb'
 module RubyExpressFoo
   MIME_TYPES=MimeTypes.new()
+  def self.parseQuery(query, obj:{})
+    query=query.split("&")
+      query.each{|val|
+        val = val.split("=")
+        obj[val[0].strip]=val[1]
+        val=nil
+      }
+      return obj
+  end
   def useDir(path)
     # exist=File.exist?(path)
     return ->(req,res){
@@ -18,7 +27,32 @@ module RubyExpressFoo
         File.open(file, 'r').each_line do |bytes|
           res.write(bytes+"\r\n")
         end
-      res.end("")
+        res.end("")
+      rescue
+        res.next();
+      end
+    }
+  end
+  def useBody()
+    return ->(req,res){
+      begin
+        if(req.method != "POST")
+          throw ""
+        end
+        socket=req.socket
+        data=req.rawBody(body:socket.readpartial(1024));
+        size=data.size;
+        if(!data)
+          throw ""
+        end
+        data.strip!
+        # data.match(/^\{.*\}$/)
+        if(req.headers["content-type"] === "application/x-www-form-urlencoded")
+          RubyExpressFoo::parseQuery(data, obj:req.body)
+        elsif(req.headers["content-type"].match(/application\/(ld+)?json5?/))
+          data=req.body(body:JSON.parse(data))
+        end
+        res.next();
       rescue
         res.next();
       end
@@ -36,9 +70,9 @@ class RubyExpress < Event
     @port = port;
     @RPaths = {};
     @SERVED = false;
-    @POSTS=@RPaths["post"]=[]
-    @GETS=@RPaths["get"]=[]
-    @USE=@RPaths["use"]=[]
+    @POSTS=@RPaths["post"] = []
+    @GETS=@RPaths["get"] = []
+    # @USE=@RPaths["use"] = []
     # @event=self
   end
   def use(pattern, callback, useThread:true)
