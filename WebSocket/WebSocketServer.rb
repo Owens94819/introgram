@@ -5,6 +5,7 @@ class WebSocketServer < Event
   def initialize(req, res, global)
     super()
       @req=req
+      @req.timeout=0
       @res=res
       @df_type="message"
       @client=@req.socket

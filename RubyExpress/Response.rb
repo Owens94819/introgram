@@ -11,7 +11,7 @@ module RubyExpressResponse
             @callback=callback;
             @arr_pos = n;
             @foo=foo;
-            @_req=Request.new(@req,@client);
+            @_req=Request.new(@req,self,@client);
             @headerSent=false;
             @responseSent=false;
             @status = 200;
@@ -55,11 +55,11 @@ module RubyExpressResponse
             return self
           end
           key = key.gsub(/\\r\\n|\\n/,'').gsub(/:/,'%3A')
-    
+
           _key=key.gsub(/(\W)/,"\\\\\\1")+":"
           reg=Regexp.new("((?:^|\\r\\n|\\n)#{_key}).*(\\r\\n|\\n|$)","i")
           val = val.gsub(/\\r\\n|\\n/,'')
-    
+
           if(@headers.match(reg))
             @headers=@headers.sub(reg,"\\1 #{val} \\2")
           else
@@ -116,20 +116,20 @@ module RubyExpressResponse
         end
         def end(bytes)
           if(@responseSent)
-            log("response sent already (end) \ndata: #{bytes}\n---")
-            return self
+            log("response sent already (end), data: #{bytes}\n---")
+            return self;
           end
           !@headerSent && sendHeaders;
           !@responseSent && (@responseSent=true);
           bytes && @client.write(bytes);
           terminate()
-          return self
+          return self;
         rescue Errno::EPIPE
           puts "Errno::EPIPE (end)"
           terminate()
           return self
         end
-        def setRawHeaders(headers)
+        def __setRawHeaders(headers)
           if(@headerSent)
             log("headers sent already")
             return self
@@ -157,6 +157,12 @@ module RubyExpressResponse
           puts "Errno::EPIPE (sendHeaders)"
           terminate()
           return self
+        end
+        def responseSent
+                    return @responseSent
+        end
+        def headerSent
+          return @headerSent
         end
         private
         def terminate

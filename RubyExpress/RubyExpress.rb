@@ -39,12 +39,12 @@ module RubyExpressFoo
         if(req.method != "POST")
           throw ""
         end
-        socket=req.socket
+        # socket=req.socket
         type=req.headers["content-type"]||""
         if(type === "application/x-www-form-urlencoded")
-          data=RubyExpressFoo::parseQuery(socket.readpartial(1024), obj:req.body)
+          data=RubyExpressFoo::parseQuery(req.rawBody(1024), obj:req.body)
         elsif(type.match?(/^application\/(ld+)?json5?$/))
-          data=req.body=JSON.parse(socket.readpartial(1024))
+          data=req.body=JSON.parse(req.rawBody(1024))
         else
           # data={}
           # req.body(body: data)
@@ -76,11 +76,11 @@ class RubyExpress < Event
     pattern= ChkPattern(pattern);
     obj = {
               pattern:pattern,
-              callback:callback, 
+              callback:callback,
               type: "use",
               useThread:useThread
           }
-    @RPaths.each{|key,val| 
+    @RPaths.each{|key,val|
       val.push(obj)
     }
     return self
@@ -113,7 +113,7 @@ class RubyExpress < Event
       return 0
     end
     @SERVED = true
-    
+
       server = TCPServer.open(@port)
       self.emit("connect",self)
 
@@ -126,4 +126,3 @@ class RubyExpress < Event
     self.emit("close",self)
   end
 end
-
