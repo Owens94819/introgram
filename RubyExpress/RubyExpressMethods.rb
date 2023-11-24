@@ -41,12 +41,12 @@ module RubyExpressMethods
     def ParseReq(_req)
       req=_req.strip().split(/\r\n([\w\W]+)/)
       req_stat= req[0].split("\s");
-  
+
       header = req[1];
       path = req_stat[1].split(/\?([\w\W]+)/);
       path[0]=URI.decode_www_form_component(path[0])#.sub(/[\/]?$/,"/")
       query = URI.decode_www_form_component(path[1]||"")
-  
+
       obj = {
         method:req_stat[0].upcase,
         url:URI.decode_www_form_component(req_stat[1]),
@@ -61,16 +61,16 @@ module RubyExpressMethods
         headers:{},
         param:{}
       }
-  
+
       header = header.split(/\r\n|\n/)
       header.each{|val|
         val = val.split(":")
         obj[:headers][val[0].strip().downcase]=val[1].strip
         val=nil
       }
-  
+
       RubyExpressFoo::parseQuery(query, obj: obj[:query])
-  
+
       # free memory
       req_stat = req = header = query = path=nil
       return obj
@@ -80,7 +80,7 @@ module RubyExpressMethods
       if(req_method_obj.length<1)
         return
       end
-  
+
       for i in n..req_method_obj.length-1
         val = req_method_obj[i]
         pattern=val[:pattern]
@@ -119,7 +119,7 @@ module RubyExpressMethods
         return log("client.eof")
       end
       request=client.gets("\r\n\r\n")
-      
+
       # 
       # while (line = client.gets&.chomp)
       #   break if line.empty?

@@ -1,5 +1,5 @@
 require("json")
-require("./Lib/WebSocketList.rb")
+require("./WebSocket/WebSocketList.rb")
 
 class WebSocketServer < Event
   def initialize(req, res, global)
@@ -34,14 +34,14 @@ class WebSocketServer < Event
   def close()
     _close("user-action")
   end
-  def id 
+  def id
     return @id
   end
   def start
     handle_websocket()
     return self
   end
-  
+
   private
 
   def accept_websocket_connection()
@@ -72,19 +72,19 @@ class WebSocketServer < Event
 
         byte=@client.getbyte
         payload_length = byte & 0b01111111
-  
+
         case payload_length
         when 126
           payload_length = @client.read(2).unpack('n')[0]
         when 127
           payload_length = @client.read(8).unpack('Q>')[0]
         end
-  
+
         mask = @client.read(4).unpack('C*')
         data = @client.read(payload_length).unpack('C*')
-  
+
         decoded_data = data.each_with_index.map { |byte, i| byte ^ mask[i % 4] }.pack('C*')
-  
+
         begin
           decoded_data=JSON.parse(decoded_data)
           if("#{decoded_data.class}" != "Hash")
@@ -96,9 +96,9 @@ class WebSocketServer < Event
         self.emit(":#{decoded_data["type"]}", decoded_data["data"])
         data=mask=decoded_data=nil
     end
-  
+
       log("a socket ended (this in unhandle and you should refer to code) filename: WebSocketServer.rb, line: (around 103), def_name: handle_websocket, pos: (at end of method)")
-    
+
   end
 
   def send_websocket_frame( opcode, data)

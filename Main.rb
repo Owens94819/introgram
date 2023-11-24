@@ -1,14 +1,14 @@
 
 
-
-require "./Lib/GlobalMethods.rb"
-require "./RubyExpress/RubyExpress.rb"
-require "./Lib/DotENV.rb"
-require "./Lib/WebSocketServer.rb"
-require "./Lib/WebsocketHandler.rb"
-require "./Lib/InstantThread.rb"
 require "base64"
 require "openssl"
+
+require "./Lib/GlobalMethods.rb"
+require "./Lib/DotENV.rb"
+require "./Lib/InstantThread.rb"
+require "./RubyExpress/RubyExpress.rb"
+require "./WebSocket/WebSocketServer.rb"
+require "./WebSocket/WebsocketHandler.rb"
 
 Dot_env.new()
 
