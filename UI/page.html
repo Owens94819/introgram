@@ -22,7 +22,7 @@
         // arr.fill(24)
         xhr.send(new Blob(["p","p"]));
 // fetch("/post",{method:"post", body:'{"p":90}'})
-        client=new WebSocket(`ws://${location.origin}/__socket__`)
+        client=new WebSocket(`ws://${location.host}/__socket__`)
         // client.send("message","hello world")
         client.on("open", function(e) {
             console.log("ready");

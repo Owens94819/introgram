@@ -18,7 +18,7 @@ RubyExpress.new()
     res.setHeader('content-type', 'text/html').sendFile('./UI/page.html')
 })
 .post('/post', ->(req, res){
-    log(req.body)
+    log(req.headers['content-length'])
     # log("--")
     res.end("hello")
 })
