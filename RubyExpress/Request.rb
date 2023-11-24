@@ -48,6 +48,11 @@ module RubyExpressRequest
           end
           return @req[:body]
         end
+        def body=(body)
+          if("#{body.class}"==="Hash")
+            @req[:body]=body
+          end
+        end
         def http
           return @req[:http]
         end

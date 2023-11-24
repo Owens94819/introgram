@@ -44,7 +44,7 @@ module RubyExpressFoo
         if(type === "application/x-www-form-urlencoded")
           data=RubyExpressFoo::parseQuery(socket.readpartial(1024), obj:req.body)
         elsif(type.match?(/^application\/(ld+)?json5?$/))
-          data=req.body(body:JSON.parse(socket.readpartial(1024)))
+          data=req.body=JSON.parse(socket.readpartial(1024))
         else
           # data={}
           # req.body(body: data)
