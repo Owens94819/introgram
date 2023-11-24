@@ -3,6 +3,8 @@ var _WebSocket=window.WebSocket;
 (function (WebSocket) {
     window.WebSocket=WebSocket
 })(function(path) {
+    protocol = location.protocol==="https:"?"WSS":"WS"
+    path = `${protocol}://${path}`
     var df_type="message"
     var ready=false
     var id;
