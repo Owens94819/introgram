@@ -118,11 +118,13 @@ module RubyExpressMethods
         client.close()
         return log("client.eof")
       end
-      request=""
-      while (line = client.gets&.chomp)
-        break if line.empty?
-        request+= line+"\r\n"
-      end
+      request=client.gets("\r\n\r\n")
+      
+      # 
+      # while (line = client.gets&.chomp)
+      #   break if line.empty?
+      #   request+= line+"\r\n"
+      # end
       if !request
         client.close()
         return log("empty request")
