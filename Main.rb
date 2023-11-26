@@ -18,10 +18,9 @@ RubyExpress.new()
 .middleware(RubyExpress.useERB("./UI/pages"))
 .get('/', ->(req, res){
     res.render("index.html.erb",{tmp:"index",path:req.path})
-    # res.render("meta-tmp.xjsx",{tmp:"index",path:req.path})
 })
 .post('/post', ->(req, res){
-    res.render("post.xjsx",{path:req.path})
+    res.render("post.html.erb",{path:req.path})
 })
 .use('/__socket__', WebsocketHandler::CallBack)
 .use('/assets/*', RubyExpress.useDir("./UI"))
