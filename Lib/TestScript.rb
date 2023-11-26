@@ -32,12 +32,12 @@
 # end
 # t.kill()
 # t.kill()
-
+# d={"p"=>99}
+# log(d["p"])
 # s=OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"])
 # s1=OpenSSL::Digest::SHA1.digest("hey")
 # d=Base64.encode64(OpenSSL::Digest::SHA1.digest("hey" + ENV["HASH"]))
 # puts d
-
 # d=JSON.parse('{"l":90,"n":9}')
 # d={}
 # if "#{d.class}" == 'Hash'
@@ -57,3 +57,38 @@
 # end
 
 # puts d(9)
+# d=File.open("main.rb", 'r');
+
+# log(d.class)
+# c=""
+# d.each do |char|
+#   log(char)
+# end
+# log(c)
+# d="pp p "
+#   data={f:9}
+#   data=[1,2,3,4,5]
+# data.each do |key,val|
+# puts(key,val)
+# next
+# puts 99
+# end
+# #
+n=9
+class J
+    def initialize
+      @test=9
+      eval('@t=77')
+    end
+    def getbinding
+            binding
+    end
+
+end
+erb=require("erb")
+template = %{_
+  <%= @t %>
+hh
+}
+
+ERB.new(template).run(J.new().getbinding)

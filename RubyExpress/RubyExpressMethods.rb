@@ -55,7 +55,7 @@ module RubyExpressMethods
         query:{},
         http:req_stat[2],
         rawHeaders: header,
-        rawBody: "",
+        rawBody: nil,
         body:{},
         rawRequest: _req,
         headers:{},
@@ -107,7 +107,7 @@ module RubyExpressMethods
           else
             Response.new(request, client, val[:callback], i+1, ->(n, argv){
               MatchClient(request, client, n, argv)
-            },val[:useThread]);
+            },@handle_bar,val[:useThread]);
           end
           break
         end
@@ -120,7 +120,6 @@ module RubyExpressMethods
       end
       request=client.gets("\r\n\r\n")
 
-      # 
       # while (line = client.gets&.chomp)
       #   break if line.empty?
       #   request+= line+"\r\n"
@@ -130,6 +129,12 @@ module RubyExpressMethods
         return log("empty request")
       end
         request = ParseReq(request)
+        @_MIDDLEWARE_.each do |val|
+          if(!val[:callback])
+                  next
+          end
+          val[:callback].call(request,client)
+        end
         MatchClient(request, client, 0, false)
     end
   end

@@ -1,4 +1,4 @@
-StatusCodes={
+STATUS_CODES={
     "100": "Continue",
     "101": "Switching Protocols",
     "102": "Processing",
@@ -63,4 +63,3 @@ StatusCodes={
     "510": "Not Extended",
     "511": "Network Authentication Required"
   }
-  

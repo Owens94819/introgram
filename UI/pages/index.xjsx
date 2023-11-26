@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/assets/JS/WebSocket.js"></script>
+</head>
+     <form action="/post" method="POST">
+        <input type="text" name="type", value="form">
+        <button type="submit">send</button>
+    </form> 
+    test
+    <script>
+        (async function (arguments) {
+        client=new WebSocket(`${location.host}/__socket__`)
+        // client.send("message","hello world")
+        client.on("open", function(e) {
+            console.log("ready");
+        })
+        client.on(":message", function(e) {
+            console.log(e);
+        })
+        console.log(client);
+        })()
+    </script>

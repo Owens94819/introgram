@@ -66,36 +66,37 @@ module RubyExpressRequest
           return @req[:rawRequest]
         end
         def rawBody(index)
-          c_length=(headers["content-length"]||"0").to_i;
-          if(@read_length>=c_length)
-            return ""
-          end
-          if(index>c_length&&@read_length===0)
-            index=c_length
-          end
-          @read_length+=index
-          begin
-            return @socket.readpartial(index)
-          rescue(EOFError)
-            return ""
-          end
+          return @req[:rawBody].call(index)
+          # c_length=(headers["content-length"]||"0").to_i;
+          # if(@read_length>=c_length)
+          #   return ""
+          # end
+          # if(index>c_length&&@read_length===0)
+          #   index=c_length
+          # end
+          # @read_length+=index
+          # begin
+          #   return @socket.readpartial(index)
+          # rescue(EOFError)
+          #   return ""
+          # end
         end
         def timeout()
           return @timeout
         end
-        def timeout=(sec)
-                    @timeout = Integer(sec)
-        end
         def body()
           return @req[:body]
+        end
+        def http
+          return @req[:http]
+        end
+        def timeout=(sec)
+          @timeout = Integer(sec)
         end
         def body=(body)
           if("#{body.class}"==="Hash")
             @req[:body]=body
           end
-        end
-        def http
-          return @req[:http]
         end
       end
 end

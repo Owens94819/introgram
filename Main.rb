@@ -13,17 +13,13 @@ require "./WebSocket/WebsocketHandler.rb"
 Dot_env.new()
 
 RubyExpress.new()
-.use('', RubyExpress.useBody())
+.middleware(RubyExpress.useBody())
+.middleware(RubyExpress.useXJSX("./UI"))
 .get('/', ->(req, res){
-    res.setHeader('content-type', 'text/html').sendFile('./UI/page.html')
+    res.render("meta-tmp.xjsx",{tmp:"index",path:req.path})
 })
 .post('/post', ->(req, res){
-    # log("---")
-    # log(req.rawBody(4))
-    # log(req.rawBody(20))
-    # log(req.headers["content-length"])
-    # log("--")
-    # res.end("hello:#{req.rawBody(2)}")
+    res.render("post.xjsx",{path:req.path})
 })
 .use('/__socket__', WebsocketHandler::CallBack)
 .use('/assets/*', RubyExpress.useDir("./UI"))

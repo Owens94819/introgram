@@ -1,12 +1,13 @@
+require("./Lib/StatusCodes.rb")
 require './RubyExpress/Request.rb'
 require 'json'
 module RubyExpressResponse
    private
-   require("./Lib/StatusCodes.rb")
     class Response
         include RubyExpressRequest
-        def initialize(req, client, callback, n, foo, useThread)
+        def initialize(req, client, callback, n, foo,handle_bar, useThread)
             @req=req;
+            @handle_bar=handle_bar;
             @client=client;
             @callback=callback;
             @arr_pos = n;
@@ -15,7 +16,7 @@ module RubyExpressResponse
             @headerSent=false;
             @responseSent=false;
             @status = 200;
-            @status_msg = StatusCodes[:"#{@status}"];
+            @status_msg = STATUS_CODES[:"#{@status}"];
             @http = "HTTP/1.1";
             @headers = "";
             @closed = false;
@@ -41,7 +42,7 @@ module RubyExpressResponse
             return self
           end
           @status = Integer(code)
-          status_msg = StatusCodes[:"#{@status}"];
+          status_msg = STATUS_CODES[:"#{@status}"];
           if(!status_msg)
             log("incorrect status code")
             return self
@@ -67,12 +68,30 @@ module RubyExpressResponse
           end
           return self
         end
+        def pipe(io_stream)
+          if("#{io_stream.class}"==="File")
+            io_stream.each do |char|
+              write(char)
+            end
+            io_stream.close()
+          else
+            throw "pipe error (pipe)"
+          end
+
+          return self
+        end
+        def render(path, data)
+          if(@handle_bar["handler"])
+            @handle_bar["handler"].call(path,data, @_req, self)
+          end
+          return self
+        end
         def send(bytes)
           self.end(bytes)
           return self
         end
         def sendStatus(code)
-          setStatus(code).end(StatusCodes[:"#{@status}"])
+          setStatus(code).end(STATUS_CODES[:"#{@status}"])
           return self
         end
         def sendFile(path)
