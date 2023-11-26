@@ -14,9 +14,11 @@ Dot_env.new()
 
 RubyExpress.new()
 .middleware(RubyExpress.useBody())
-.middleware(RubyExpress.useXJSX("./UI"))
+# .middleware(RubyExpress.useXJSX("./UI"))
+.middleware(RubyExpress.useERB("./UI/pages"))
 .get('/', ->(req, res){
-    res.render("meta-tmp.xjsx",{tmp:"index",path:req.path})
+    res.render("index.html.erb",{tmp:"index",path:req.path})
+    # res.render("meta-tmp.xjsx",{tmp:"index",path:req.path})
 })
 .post('/post', ->(req, res){
     res.render("post.xjsx",{path:req.path})

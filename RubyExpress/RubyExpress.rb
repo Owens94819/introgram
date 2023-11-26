@@ -104,13 +104,6 @@ module RubyExpressFoo
                   res.write(
                     "`;"
                   )
-                  # res.write(
-                  #   "`;\n"\
-                  #   "j=tmp.content.querySelectorAll(\"meta,script,link,style\");"\
-                  #   "for(var i=0; i<j.length;i++){"\
-                  #   "j[i].remove()"\
-                  #   "}"
-                  #   )
               end
               res.end(
                 "tmp=j=void 0;"\
@@ -132,16 +125,6 @@ module RubyExpressFoo
               if(!exist)
                     throw "!exist"
               end
-              # res.write(
-              #   "var meta = document.getElementById(\"XJSX-META\");"\
-              #   "try{"\
-              #   " meta = JSON.parse(meta.innerHTML);"\
-              #   "for(var key in meta){"\
-              #   "window[key]=meta[key]"\
-              #   "}"\
-              #   "meta=void 0;"\
-              #   "}catch(err){console.log(err)}"\
-              #   )
               res.pipe(File.open(xjsx, 'r'))
               res.write(";")
               _modules.each do |_module|
@@ -176,11 +159,6 @@ module RubyExpressFoo
                 res.write("window[\"#{key}\"]=`#{val}`;")
               end
               res.write("</script>")
-              # res.write(
-              #   "<script type=\"application/json\" id=\"XJSX-META\">"\
-              #   "#{JSON.unparse(data)}"\
-              #   "</script>"\
-              # )
               res.pipe(File.open(path, 'r')).end("")
             rescue UncaughtThrowError
               log("Error (render())")
@@ -188,6 +166,32 @@ module RubyExpressFoo
           }
           return false
     }
+  end
+  def useERB(path)
+    require("erb")
+    get_binding=->(data){
+      return binding
+    }
+    return ->(_self:,handle_bar:){
+      handle_bar["view"]=path
+      handle_bar["handler"]=->(path, data, req, res){
+        path = File.join(handle_bar["view"], path)
+        begin
+          exist=File.exist?(path)&&!File.directory?(path)#&&!file.match?("\\.\\.")
+          if(!exist)
+            throw "no File"
+          end
+          res.setHeader("Content-Type","text/html")
+          file=File.open(path, 'r')
+          res.write(ERB.new(file.read()).result(get_binding.call(data)))
+          file.close()
+          res.end("");
+        rescue UncaughtThrowError
+          log("Error (render())")
+        end
+      }
+      return false
+}
   end
 end
 

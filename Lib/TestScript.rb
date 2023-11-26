@@ -74,21 +74,21 @@
 # puts 99
 # end
 # #
-n=9
-class J
-    def initialize
-      @test=9
-      eval('@t=77')
-    end
-    def getbinding
-            binding
-    end
+# n=9
+# class J
+#     def initialize
+#       @test=9
+#       eval('@t=77')
+#     end
+#     def getbinding
+#             binding
+#     end
 
-end
-erb=require("erb")
-template = %{_
-  <%= @t %>
-hh
-}
+# end
+# erb=require("erb")
+# template = %{_
+#   <%= @t %>
+# hh
+# }
 
-ERB.new(template).run(J.new().getbinding)
+# ERB.new("kk").run()#.run(J.new().getbinding)
